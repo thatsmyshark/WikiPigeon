@@ -10,6 +10,12 @@
 
 Wikiracing is when users race each other to get from one Wikipedia article (Starting page) to another (Target page) using only the internal redirect links inside Wikipedia articles.
 
+<div align="center">
+  
+  <img src="assets/wikipigeon_ss.png" alt="Logo">
+  
+</div>
+
 WikiPigeon allows you to assess your Wikiracing skills by tracking how many pages it took for you to reach your target page, how much time you spent on each page, how many times you needed to backtrack, and so much more! 
 
 ## Installation
