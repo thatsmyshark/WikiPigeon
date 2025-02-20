@@ -62,7 +62,7 @@ In WikiPigeon, lowest score wins. The scoring system works as follows:
   </tr>
 </table>
 
-## Specs
+## System Info
 Tested browsers: Google Chrome / Opera / Opera GX
 
 
