@@ -271,6 +271,6 @@ class WikiPigeon:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.iconbitmap(r"C:\\Users\\user\\Documents\\wikitrack\\wikipigeon.ico")
+    #root.iconbitmap(r"C:\\Users\\user\\Documents\\wikitrack\\wikipigeon.ico")
     app = WikiPigeon(root)
     root.mainloop()
