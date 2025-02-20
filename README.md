@@ -51,16 +51,20 @@ In WikiPigeon, lowest score wins. The scoring system works as follows:
     <th>Condition</th>
   </tr>
   <tr>
-    <td>+10 PP</td>
-    <td>For every 60 seconds that elapses</td>
+    <td>+10</td>
+    <td>For every use of Ctrl+F </td>
   </tr>
   <tr>
-    <td>+5 PP</td>
+    <td>+8</td>
     <td>For every Backtrack</td>
   </tr>
   <tr>
-    <td>+2 PP</td>
+    <td>+4</td>
     <td>For every new Page visited</td>
+  </tr>
+  <tr>
+    <td>+2</td>
+    <td>For every 30 seconds that elapses</td>
   </tr>
 </table>
 
