@@ -4,14 +4,14 @@ import tkinter as tk
 import webbrowser
 import pygetwindow as gw
 import requests
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup  # type: ignore
 
 class WikiPigeon:
     def __init__(self, root):
         self.root = root
         self.root.title("WikiPigeon")
         self.root.configure(bg="#2E2E2E")
-        self.root.geometry("500x600+100+100")
+        self.root.geometry("550x600+100+100")
 
         self.history = []
         self.last_node_positions = {}
@@ -26,6 +26,9 @@ class WikiPigeon:
         self.node_count = 0
         self.score = 0  # Add a score variable
         self.Backtracks = 0
+
+        self.zoom_scale = 1.0  # Track the zoom level
+        self.zooming = False  # Track if zooming is active
 
         stopwatch_frame = tk.Frame(root, bg="#2E2E2E")
         stopwatch_frame.pack()
@@ -44,6 +47,12 @@ class WikiPigeon:
 
         self.end_button = tk.Button(stopwatch_frame, text="End", fg="white", bg="#2e2e2e", command=self.stop)
         self.end_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.zoom_in_button = tk.Button(stopwatch_frame, text="Zoom In", fg="white", bg="#2e2e2e", command=self.zoom_in)
+        self.zoom_in_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.zoom_out_button = tk.Button(stopwatch_frame, text="Zoom Out", fg="white", bg="#2e2e2e", command=self.zoom_out)
+        self.zoom_out_button.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.canvas_frame = tk.Frame(root)
         self.canvas_frame.pack(fill=tk.BOTH, expand=True)
@@ -79,7 +88,6 @@ class WikiPigeon:
         tracking_thread = threading.Thread(target=self.track_wikipedia, daemon=True)
         tracking_thread.start()
 
-    #tracks current wiki page and runs operations to update program memory
     def track_wikipedia(self):
         initial_x = 100
         fixed_y = 200
@@ -89,6 +97,7 @@ class WikiPigeon:
             if active_window:
                 title = active_window.title
                 if " - Wikipedia" in title:
+                    self.reset_zoom()  # Reset zoom before drawing
                     self.start()
                     page_title = title.replace(" - Wikipedia", "").replace(" - Opera", "").strip()
 
@@ -151,7 +160,6 @@ class WikiPigeon:
 
             time.sleep(0)
 
-    #checks for links in prev. page to compare to current page
     def check_for_hyperlink(self, previous_page, current_page):
         if not previous_page:
             return False
@@ -176,41 +184,35 @@ class WikiPigeon:
             print(f"Couldn't retrieve {previous_page_url}: {e}")
         return False
 
-    #update timeline list func
     def update_history(self):
         self.history_list.delete(0, tk.END)
         for item in self.history:
             self.history_list.insert(tk.END, item)
 
-    #hyperlinking counting func
     def open_in_browser(self, event):
         selected_index = self.history_list.curselection()
         if selected_index:
             title = self.history_list.get(selected_index)
             webbrowser.open(f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}")
 
-    #node counting function
     def update_node_count(self):
         self.node_count_label.config(text=f"Nodes: {self.node_count}")
 
-    #score counting function
     def add_score(self, points):
         self.score += points
         self.score_label.config(text=f"Score: {self.score}")
 
-    #Backtracks counting function
     def add_Backtracks(self, tbs):
         self.Backtracks += tbs
         self.Backtracks_label.config(text=f"Backtracks: {self.Backtracks}")
 
-    #program reset function
     def reset_program(self):
         self.history = []
         self.last_node_positions = {}
         self.current_page = None
         self.canvas.delete("all")
         self.node_count = 0
-        self.score = 0  # Reset score
+        self.score = 0
         self.update_node_count()
         self.score_label.config(text="Score: 0")
         self.update_history()
@@ -224,8 +226,26 @@ class WikiPigeon:
         self.running = False
         self.elapsed_time = 0
         self.time_label.config(text="00:00:00")
+        self.zoom_scale = 1.0
+        self.canvas.scale("all", 0, 0, 1, 1)
 
-    #stopwatch functions
+    def reset_zoom(self):
+        if self.zoom_scale != 1.0:
+            self.canvas.scale("all", 0, 0, 1 / self.zoom_scale, 1 / self.zoom_scale)
+            self.zoom_scale = 1.0
+
+    def zoom_in(self):
+        if self.zoom_scale < 2.0:
+            self.zoom_scale += 0.1
+            self.canvas.scale("all", 0, 0, 1.1, 1.1)
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def zoom_out(self):
+        if self.zoom_scale > 0.5:
+            self.zoom_scale -= 0.1
+            self.canvas.scale("all", 0, 0, 0.9, 0.9)
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
     def update_time(self):
         if self.running:
             self.elapsed_time = time.time() - self.start_time
@@ -234,15 +254,17 @@ class WikiPigeon:
             time_string = f"{hours:02}:{minutes:02}:{seconds:02}"
             self.time_label.config(text=time_string)
 
-            if int(self.elapsed_time) % 60 == 0 and self.elapsed_time > 0:  # Add score every 10 seconds
+            if int(self.elapsed_time) % 60 == 0 and self.elapsed_time > 0:
                 self.add_score(10)
 
             self.root.after(1000, self.update_time)
+
     def start(self):
         if not self.running:
             self.running = True
             self.start_time = time.time() - self.elapsed_time
             self.update_time()
+
     def stop(self):
         if self.running:
             self.running = False
