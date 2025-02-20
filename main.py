@@ -25,7 +25,7 @@ class WikiPigeon:
         self.stopwatch_color = "#cccccc"
         self.node_count = 0
         self.score = 0  # Add a score variable
-        self.takebacks = 0
+        self.Backtracks = 0
 
         stopwatch_frame = tk.Frame(root, bg="#2E2E2E")
         stopwatch_frame.pack()
@@ -39,8 +39,8 @@ class WikiPigeon:
         self.score_label = tk.Label(stopwatch_frame, text=": 0", bg="#2E2E2E", fg="yellow", font=("Inter", 12))
         self.score_label.pack(side=tk.LEFT, padx=5, pady=5)
 
-        self.takebacks_label = tk.Label(stopwatch_frame, text="Takebacks: 0", bg="#2E2E2E", fg="#ff6961", font=("Inter", 12))
-        self.takebacks_label.pack(side=tk.LEFT, padx=5, pady=5)
+        self.Backtracks_label = tk.Label(stopwatch_frame, text="Backtracks: 0", bg="#2E2E2E", fg="#ff6961", font=("Inter", 12))
+        self.Backtracks_label.pack(side=tk.LEFT, padx=5, pady=5)
 
         self.end_button = tk.Button(stopwatch_frame, text="End", fg="white", bg="#2e2e2e", command=self.stop)
         self.end_button.pack(side=tk.LEFT, padx=5, pady=5)
@@ -108,7 +108,7 @@ class WikiPigeon:
                             self.update_history()
                         else:
                             self.add_score(5)  # Add 5 points if the user goes back to a previously visited page
-                            self.add_takebacks(1)
+                            self.add_Backtracks(1)
 
                         if previous_page:
                             parent_position = self.last_node_positions.get(previous_page, (initial_x, fixed_y))
@@ -198,10 +198,10 @@ class WikiPigeon:
         self.score += points
         self.score_label.config(text=f"Score: {self.score}")
 
-    #takebacks counting function
-    def add_takebacks(self, tbs):
-        self.takebacks += tbs
-        self.takebacks_label.config(text=f"Takebacks: {self.takebacks}")
+    #Backtracks counting function
+    def add_Backtracks(self, tbs):
+        self.Backtracks += tbs
+        self.Backtracks_label.config(text=f"Backtracks: {self.Backtracks}")
 
     #program reset function
     def reset_program(self):
