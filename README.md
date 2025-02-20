@@ -11,8 +11,10 @@
 Wikiracing is when users race each other to get from one Wikipedia article (Starting page) to another (Target page) using only the internal redirect links inside Wikipedia articles.
 
 <div align="center">
-  
+
+  <br><br>
   <img src="assets/wikipigeon_ss.png" alt="Logo">
+  <br><br>
   
 </div>
 
