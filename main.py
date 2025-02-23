@@ -4,6 +4,7 @@ import tkinter as tk
 import webbrowser
 import pygetwindow as gw
 import requests
+import keyboard
 from bs4 import BeautifulSoup  # type: ignore
 
 class WikiPigeon:
@@ -21,6 +22,8 @@ class WikiPigeon:
         self.start_time = None
         self.elapsed_time = 0
         self.page_entry_time = None  # Track when a page is first visited
+
+        keyboard.add_hotkey('ctrl+f', self.ctrl_f_penalty)
 
         self.stopwatch_color = "#cccccc"
         self.node_count = 0
@@ -102,11 +105,11 @@ class WikiPigeon:
                     page_title = title.replace(" - Wikipedia", "").replace(" - Opera", "").strip()
 
                     if page_title != self.current_page:
-                        if self.current_page and self.page_entry_time:
+                        if self.current_page and self.page_entry_time and page_title not in self.history:
                             time_spent = int(time.time() - self.page_entry_time)
                             current_position = self.last_node_positions.get(self.current_page, (initial_x, fixed_y))
                             self.canvas.create_text(current_position[0], current_position[1] + 15, text=f"{time_spent}s", fill="#222222", font=("Arial", 8))
-
+                
                         self.page_entry_time = time.time()  # Reset entry time for the new page
 
                         previous_page = self.current_page
@@ -122,7 +125,7 @@ class WikiPigeon:
                         if previous_page:
                             parent_position = self.last_node_positions.get(previous_page, (initial_x, fixed_y))
                             new_x = parent_position[0] + 200
-                            parent_y = parent_position[1]
+                            parent_y = parent_position[1] 
 
                             if page_title in self.last_node_positions:
                                 new_x, new_y = self.last_node_positions[page_title]
@@ -213,6 +216,7 @@ class WikiPigeon:
         self.canvas.delete("all")
         self.node_count = 0
         self.score = 0
+        self.Backtracks = 0
         self.update_node_count()
         self.score_label.config(text="Score: 0")
         self.update_history()
@@ -241,10 +245,13 @@ class WikiPigeon:
             self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def zoom_out(self):
-        if self.zoom_scale > 0.5:
+        if self.zoom_scale > 0.1:
             self.zoom_scale -= 0.1
             self.canvas.scale("all", 0, 0, 0.9, 0.9)
             self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def ctrl_f_penalty(self):
+        self.add_score(10)
 
     def update_time(self):
         if self.running:
@@ -254,7 +261,7 @@ class WikiPigeon:
             time_string = f"{hours:02}:{minutes:02}:{seconds:02}"
             self.time_label.config(text=time_string)
 
-            if int(self.elapsed_time) % 60 == 0 and self.elapsed_time > 0:
+            if int(self.elapsed_time) % 30 == 0 and self.elapsed_time > 0:
                 self.add_score(10)
 
             self.root.after(1000, self.update_time)
