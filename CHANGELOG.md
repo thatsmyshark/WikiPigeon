@@ -5,6 +5,7 @@
 - Ctrl+F score penalties added.
 
 ### Changed
+- Anticheat compares actual links between one another instead of only titles. Decreasing the chance for false flags.
 - Backtrack score now resets on reset button push.
 - Zoom-out maximum distance increased.
 - Time score penalties increased.
