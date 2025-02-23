@@ -166,26 +166,37 @@ class WikiPigeon:
     def check_for_hyperlink(self, previous_page, current_page):
         if not previous_page:
             return False
-        else:
-            previous_page_url = f"https://en.wikipedia.org/wiki/{previous_page.replace(' ', '_')}"
-            current_page_url = f"https://en.wikipedia.org/wiki/{current_page.replace(' ', '_')}"
 
         try:
-            response = requests.get(previous_page_url)
+            # Get the actual Wikipedia URL for the previous page
+            previous_page_url = f"https://en.wikipedia.org/wiki/{previous_page.replace(' ', '_')}"
+            response = requests.get(previous_page_url, allow_redirects=True)
             response.raise_for_status()
 
             soup = BeautifulSoup(response.text, 'html.parser')
+        
+            # Extract the actual canonical URL (handles redirects)
+            canonical_link = soup.find("link", {"rel": "canonical"})
+            if canonical_link:
+                previous_page_url = canonical_link["href"]  # Now we have the real URL
+
+            # Generate the expected full URL for the current page
+            current_page_url = f"https://en.wikipedia.org/wiki/{current_page.replace(' ', '_')}"
+
+            # Find all links on the previous page and check if one matches the current page URL
             links = soup.find_all('a', href=True)
             for link in links:
                 href = link['href']
                 if href.startswith("/wiki/"):
                     absolute_url = f"https://en.wikipedia.org{href}"
                     if absolute_url == current_page_url:
-                        return True
+                        return True  # Found a hyperlink leading to the current page
 
         except requests.exceptions.RequestException as e:
             print(f"Couldn't retrieve {previous_page_url}: {e}")
-        return False
+
+        return False  # No hyperlink found
+
 
     def update_history(self):
         self.history_list.delete(0, tk.END)
